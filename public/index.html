@@ -8,16 +8,97 @@
     <script src="/socket.io/socket.io.js"></script>
     <title>파루 와르도 관리</title>
 </head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+    }
+
+    h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+
+    .signal-container {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 2px solid black;
+        border-radius: 50px;
+        width: 500px;
+        background-color: gray;
+        text-align: center;
+    }
+
+    .signal {
+        width: 50px;
+        height: 50px;
+        margin: 0 10px;
+        border-radius: 50%;
+        border: 2px solid black;
+    }
+
+    .red {
+        background-color: red;
+    }
+
+    .yellow {
+        background-color: yellow;
+    }
+
+    .green {
+        background-color: rgb(18, 218, 18);
+    }
+
+    .black {
+        background-color: black;
+    }
+
+    .buttons {
+        margin-bottom: 20px;
+    }
+
+    button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-size: 1em;
+        border: 2px solid black;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .message-box {
+        border: 2px solid black;
+        padding: 10px;
+        border-radius: 10px;
+        width: 600px;
+        height: 300px;
+        margin: 0 auto;
+    }
+
+    .message-box p {
+        margin: 0;
+    }
+</style>
 
 <body>
-    <h1>관리</h1>
-    <p></p>
-    <button id="checkButton">프로세스확인</button>
-    <p id="status"></p>
-    <br />
-    <button id="startButton">시작</button>
-    <button id="killButton">종료</button>
-    <p id="result"></p>
+    <h1>프로세스 신호등</h1>
+    <div class="signal-container">
+        <div id="red" class="signal black"></div>
+        <div id="yellow" class="signal black"></div>
+        <div id="green" class="signal black"></div>
+    </div>
+    <div class="buttons">
+        <button id="checkButton">갱신</button>
+        <button id="startButton">시작</button>
+        <button id="killButton">종료</button>
+    </div>
+    <div class="message-box">
+        <p id="result"></p>
+    </div>
 
     <script>
         const socket = io();
@@ -39,8 +120,16 @@
         });
 
         socket.on('processStatus', (status) => {
-            if (status >= 2) $('#status').text("켜져있음");
-            else $('#status').text("꺼져있음");
+            if (status >= 2) {
+                $("#red").attr('class', 'signal black');
+                $("#yellow").attr('class', 'signal black');
+                $("#green").attr('class', 'signal green');
+            }
+            else {
+                $("#red").attr('class', 'signal red');
+                $("#yellow").attr('class', 'signal black');
+                $("#green").attr('class', 'signal black');
+            }
         });
 
         $(function () {
