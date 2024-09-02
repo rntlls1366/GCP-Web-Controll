@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <title>파루 와르도 관리</title>
+</head>
+
+<body>
+    <h1>관리</h1>
+    <p></p>
+    <button id="checkButton">프로세스확인</button>
+    <p id="status"></p>
+    <br />
+    <button id="startButton">시작</button>
+    <button id="killButton">종료</button>
+    <p id="result"></p>
+
+    <script>
+        const socket = io();
+
+        $("#startButton").click(() => {
+            socket.emit('startProcess');
+        });
+
+        $("#killButton").click(() => {
+            socket.emit('killProcess');
+        });
+
+        $("#checkButton").click(() => {
+            socket.emit('checkProcess');
+        });
+
+        socket.on('message', (message) => {
+            $('#result').text(message);
+        });
+
+        socket.on('processStatus', (status) => {
+            if (status >= 2) $('#status').text("켜져있음");
+            else $('#status').text("꺼져있음");
+        });
+
+        $(function () {
+            socket.emit('checkProcess');
+        });
+    </script>
+</body>
+
+</html>
