@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
                 socket.emit('message', `stderr: ${stderr}`);
                 return;
             }
-            socket.emit('message', `Process killed successfully: ${stdout}`);
+            socket.emit('message', `서버 종료됨`);
 
         });
 
@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
 
     socket.on('startProcess', () => {
         if (process >= 2) {
-            socket.emit('message', `Server is already running..!`);
+            socket.emit('message', `서버가 이미 실행 중입니다.`);
             checkProcessStatus(socket);
             return;
         }
@@ -66,6 +66,16 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
+
+    setInterval(() => {
+        exec('free -h', (error, stdout, stderr) => {
+            socket.emit('memory', stdout);
+        });
+        exec('mpstat', (error, stdout, stderr) => {
+            socket.emit('cpu', stdout);
+        });
+    }, 1000);
+
 
 
 });

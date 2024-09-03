@@ -79,6 +79,15 @@
         margin: 0 auto;
     }
 
+    .message-box-small {
+        border: 2px solid black;
+        padding: 10px;
+        border-radius: 10px;
+        width: 600px;
+        height: 100px;
+        margin: 0 auto;
+    }
+
     .message-box p {
         margin: 0;
     }
@@ -88,7 +97,7 @@
     <h1>프로세스 신호등</h1>
     <div class="signal-container">
         <div id="red" class="signal black"></div>
-        <div id="yellow" class="signal black"></div>
+        <div id="yellow" class="signal yellow"></div>
         <div id="green" class="signal black"></div>
     </div>
     <div class="buttons">
@@ -99,19 +108,29 @@
     <div class="message-box">
         <p id="result"></p>
     </div>
-
+    <h2>CPU 사용량</h2>
+    <div class="message-box-small">
+        <p id="cpu"></p>
+    </div>
+    <h2>메모리 사용량</h2>
+    <div class="message-box-small">
+        <p id="memory"></p>
+    </div>
     <script>
         const socket = io();
 
         $("#startButton").click(() => {
+            setYellow();
             socket.emit('startProcess');
         });
 
         $("#killButton").click(() => {
+            setYellow();
             socket.emit('killProcess');
         });
 
         $("#checkButton").click(() => {
+            setYellow();
             socket.emit('checkProcess');
         });
 
@@ -132,9 +151,40 @@
             }
         });
 
+        socket.on('cpu', (result) => {
+
+            const parts = result.split(/\s+/);
+            const usrIndex = parts.indexOf("%usr");
+            const usrValue = parts[usrIndex + 12];
+            result = `${usrValue}%`;
+
+            $('#cpu').text(result);
+        });
+
+        socket.on('memory', (result) => {
+
+            const lines = result.split('\n');
+            const memLine = lines.find(line => line.startsWith('Mem:'));
+            const parts = memLine.split(/\s+/);
+
+            const total = parts[1];
+            const used = parts[2];
+            const free = parts[3];
+
+            result = `Total: ${total}, Used: ${used}, Free: ${free}`;
+
+            $('#memory').text(result);
+        });
+
         $(function () {
             socket.emit('checkProcess');
         });
+
+        function setYellow() {
+            $("#red").attr('class', 'signal black');
+            $("#yellow").attr('class', 'signal yellow');
+            $("#green").attr('class', 'signal black');
+        }
     </script>
 </body>
 
