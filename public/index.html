@@ -154,9 +154,11 @@
         socket.on('cpu', (result) => {
 
             const parts = result.split(/\s+/);
-            const usrIndex = parts.indexOf("%usr");
-            const usrValue = parts[usrIndex + 12];
-            result = `${usrValue}%`;
+            const idleIndex = parts.indexOf("%idle");
+            const idleValue = parseFloat(parts[idleIndex + 12]);
+
+            const cpuUsage = 100 - idleValue;
+            result = `CPU Usage: ${cpuUsage.toFixed(2)}%`;
 
             $('#cpu').text(result);
         });
