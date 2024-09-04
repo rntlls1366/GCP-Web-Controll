@@ -3,11 +3,13 @@ const { exec } = require('child_process');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+const PROCESS_NAME = "PalServer";
+const SCRIPT_URL = "/home/steam/.steam/steam/steamapps/common/PalServer/PalServer.sh";
 
 app.use(express.static('public'));
 
@@ -20,7 +22,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('killProcess', () => {
-        exec('pkill -f PalServer', (error, stdout, stderr) => {
+        exec(`pkill -f ${PROCESS_NAME}`, (error, stdout, stderr) => {
             if (error) {
                 socket.emit('message', `Error: ${error.message}`);
                 return;
@@ -46,7 +48,7 @@ io.on('connection', (socket) => {
         }
         process_num = 2;
         socket.emit('message', `서버 실행 중..`);
-        exec(`nohup ${process.env.SCRIPT_URL} &`, (error, stdout, stderr) => {
+        exec(`nohup ${SCRIPT_URL} &`, (error, stdout, stderr) => {
             if (error) {
                 socket.emit('message', `Error: ${error.message}`);
                 return;
@@ -83,7 +85,7 @@ io.on('connection', (socket) => {
 });
 
 function checkProcessStatus(socket) {
-    exec(`pgrep -c ${process.env.PROCESS_NAME}`, (error, stdout, stderr) => {
+    exec(`pgrep -c ${PROCESS_NAME}`, (error, stdout, stderr) => {
         console.log(stdout);
         process_num = stdout;
         socket.emit('processStatus', process_num);
