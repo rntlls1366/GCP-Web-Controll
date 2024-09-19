@@ -3,12 +3,13 @@ const { exec } = require('child_process');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const dotenv = require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-const PROCESS_NAME = "PalServer";
+const PROCESS_NAME = process.env.PROCESS_NAME;
 const SCRIPT_URL = "/home/steam/.steam/steam/steamapps/common/PalServer/PalServer.sh";
 
 app.use(express.static('public'));
