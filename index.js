@@ -71,23 +71,28 @@ io.on('connection', (socket) => {
 
     socket.on('userCommand', (request) => {
         console.log(request);
-        if(request.key != KEY) {
+        if (request.key != KEY) {
             socket.emit('message', `잘못된 키 입력입니다.`);
             return;
         }
-        
-        exec(`${request.command}`, (error, stdout, stderr) => {
-            if (error) {
-                socket.emit('message', `Error: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                socket.emit('message', `stderr: ${stderr}`);
-                return;
-            }
-            socket.emit('message', `커맨드 결과 : ${stdout}`);
 
-        });
+        try {
+            exec(`${request.command}`, (error, stdout, stderr) => {
+                if (error) {
+                    socket.emit('message', `Error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    socket.emit('message', `stderr: ${stderr}`);
+                    return;
+                }
+                socket.emit('message', `커맨드 결과 : ${stdout}`);
+
+            });
+        }
+        catch(e) {
+            socket.emit('message', `에러 : ${e}`);
+        }
     })
 
     socket.on('disconnect', () => {
