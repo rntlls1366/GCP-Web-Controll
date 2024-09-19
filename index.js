@@ -70,7 +70,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('userCommand', (request) => {
-        console.log(request);
+
         if (request.key != KEY) {
             socket.emit('message', `잘못된 키 입력입니다.`);
             return;
