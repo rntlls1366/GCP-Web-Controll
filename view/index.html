@@ -11,8 +11,13 @@
 <style>
     body {
         font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
         text-align: center;
-        margin: 20px;
     }
 
     h1 {
@@ -91,9 +96,64 @@
     .message-box p {
         margin: 0;
     }
+
+    .add-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        width: 200px;
+        height: 40px;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .add-button:hover {
+        background-color: #0056b3;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 10px;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
 
 <body>
+    <button class="add-button">직접 커맨드 입력</button>
     <h1>프로세스 신호등</h1>
     <div class="signal-container">
         <div id="red" class="signal black"></div>
@@ -115,6 +175,22 @@
     <h2>메모리 사용량</h2>
     <div class="message-box-small">
         <p id="memory"></p>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Key 입력</h2>
+            <input id="key" type="text" placeholder="Key를 입력하세요"
+                style="width: 90%; padding: 10px; margin-top: 10px;">
+            <h2>커맨드 입력</h2>
+            <input id="command" type="text" placeholder="실행할 커맨드를 입력하세요"
+                style="width: 90%; padding: 10px; margin-top: 10px;">
+            <button id="command-submit"
+                style="width: 80%; padding: 10px; margin-top: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px;">
+                전송
+            </button>
+        </div>
     </div>
     <script>
         const socket = io();
@@ -180,7 +256,41 @@
 
         $(function () {
             socket.emit('checkProcess');
+
+            key = localStorage.getItem("key");
+            if (key) $("#key").val(key);
+
+            //커맨드 입력 모달창 열기 닫기
+            $(".add-button").click(() => {
+                $("#myModal").show();
+            });
+
+            $(".close").click(() => {
+                $("#myModal").hide();
+            });
+
+            //커맨드 전송 이벤트
+            $("#command-submit").click(() => {
+                const request = {
+                    key: $("#key").val(),
+                    command: $("#command").val()
+                };
+
+                socket.emit('userCommand', request);
+                $("#myModal").hide();
+            });
+
+            $("#key").change(() => {
+                setKey();
+            });
+
+
         });
+
+        //키 저장
+        const setKey = () => {
+            localStorage.setItem("key", $("#key").val());
+        };
 
         function setYellow() {
             $("#red").attr('class', 'signal black');
