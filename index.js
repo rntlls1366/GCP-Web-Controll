@@ -69,6 +69,7 @@ io.on('connection', (socket) => {
         }, 2000);
     });
 
+    /*
     socket.on('userCommand', (request) => {
 
         if (request.key != KEY) {
@@ -94,6 +95,7 @@ io.on('connection', (socket) => {
             socket.emit('message', `에러 : ${e}`);
         }
     })
+        */
 
     socket.on('disconnect', () => {
         console.log('A user disconnected');
